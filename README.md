@@ -1,5 +1,7 @@
 # @j6k4m8/catl-parser
 
+![NPM Version](https://img.shields.io/npm/v/%40j6k4m8%2Fcatl-parser?style=for-the-badge) [![CATL Version](https://img.shields.io/badge/CATL-v0.1-blue?style=for-the-badge)](https://github.com/j6k4m8/catl)
+
 > **Latest supported CATL version:** [v0.1](https://github.com/j6k4m8/catl)
 
 A small TypeScript parser for [**CATL** (Chord and Tab Language)](https://github.com/j6k4m8/catl/): a compact text format for guitar chords and tab events.

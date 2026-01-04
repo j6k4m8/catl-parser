@@ -24,6 +24,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "prepack": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest"
   },

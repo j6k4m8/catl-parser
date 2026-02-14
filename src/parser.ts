@@ -254,13 +254,18 @@ export function parse(tokens: Token[], lexerDiagnostics: Diagnostic[] = []): Fil
         // Header line if starts with {
         if (at("LBrace")) {
             const header = parseHeaderLine();
-            // consume to newline
-            while (!at("Newline") && !at("EOF")) next();
-            const endTok = peek();
-            if (at("Newline")) next();
             if (header) {
                 lines.push({ kind: "HeaderLine", header, span: { start: startTok.span.start, end: header.span.end } });
+                // Support one-liners where header and statement share a line.
+                if (!at("Newline") && !at("EOF")) {
+                    lines.push(parseStatementLine());
+                }
+                if (at("Newline")) next();
             } else {
+                // Invalid header: consume the rest of the line to resync and emit an empty statement.
+                while (!at("Newline") && !at("EOF")) next();
+                const endTok = peek();
+                if (at("Newline")) next();
                 lines.push({ kind: "StatementLine", elements: [], span: { start: startTok.span.start, end: endTok.span.end } });
             }
             continue;

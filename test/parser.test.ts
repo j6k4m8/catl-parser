@@ -58,6 +58,27 @@ describe("CATL parser", () => {
         expect(e0.annotation?.text).toBe("When");
     });
 
+    it("parses one-liners with header and events on the same line", () => {
+        const src = `{eBGDAE} 0A 0D 5e:"you"`;
+        const ast = parseCATL(src);
+
+        expect(ast.diagnostics.filter(d => d.severity === "error")).toHaveLength(0);
+        expect(ast.lines).toHaveLength(2);
+        expect(ast.lines[0].kind).toBe("HeaderLine");
+        // @ts-expect-error narrow
+        expect(ast.lines[0].header.stringIds.join("")).toBe("eBGDAE");
+
+        const stmt = ast.lines[1];
+        expect(stmt.kind).toBe("StatementLine");
+        // @ts-expect-error narrow
+        expect(stmt.elements).toHaveLength(3);
+        // @ts-expect-error narrow
+        const e2 = stmt.elements[2];
+        expect(e2.kind).toBe("EventSpec");
+        // @ts-expect-error narrow
+        expect(e2.annotation?.text).toBe("you");
+    });
+
     it("parses indexed-string events and simultaneity", () => {
         const src = `{eBGDAE}\n3@1+0@4:"fall in love"\n`;
         const ast = parseCATL(src);

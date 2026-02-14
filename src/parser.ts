@@ -8,6 +8,7 @@ import { Token, TokenKind } from "./lexer";
 export function parse(tokens: Token[], lexerDiagnostics: Diagnostic[] = []): FileAST {
     const diagnostics: Diagnostic[] = [...lexerDiagnostics];
     let i = 0;
+    const DEFAULT_HEADER_STRING_IDS = ["e", "B", "G", "D", "A", "E"];
 
     const peek = (k = 0) => tokens[i + k] ?? tokens[tokens.length - 1];
     const at = (kind: TokenKind, k = 0) => peek(k).kind === kind;
@@ -269,6 +270,21 @@ export function parse(tokens: Token[], lexerDiagnostics: Diagnostic[] = []): Fil
         const stmt = parseStatementLine();
         if (at("Newline")) next();
         lines.push(stmt);
+    }
+
+    const hasHeaderLine = lines.some((line) => line.kind === "HeaderLine");
+    if (!hasHeaderLine) {
+        const start = tokens[0]?.span.start ?? { offset: 0, line: 1, col: 1 };
+        const defaultHeader: HeaderNode = {
+            kind: "Header",
+            stringIds: DEFAULT_HEADER_STRING_IDS,
+            span: { start, end: start }
+        };
+        lines.unshift({
+            kind: "HeaderLine",
+            header: defaultHeader,
+            span: { start, end: start }
+        });
     }
 
     return { lines, diagnostics };

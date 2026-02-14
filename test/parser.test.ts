@@ -2,13 +2,24 @@ import { describe, it, expect } from "vitest";
 import { parseCATL } from "../src/index";
 
 describe("CATL parser", () => {
+    it("defaults to {eBGDAE} header when no header is provided", () => {
+        const src = `0A:"When" 0D 5e:"you"\n`;
+        const ast = parseCATL(src);
+
+        expect(ast.diagnostics.filter(d => d.severity === "error")).toHaveLength(0);
+        expect(ast.lines[0].kind).toBe("HeaderLine");
+        // @ts-expect-error narrow
+        expect(ast.lines[0].header.stringIds.join("")).toBe("eBGDAE");
+        expect(ast.lines[1].kind).toBe("StatementLine");
+    });
+
     it("parses chord specs with prefix name + suffix annotation", () => {
         const src = `"Gmin7":3x332x:"Nice chord!"\n`;
         const ast = parseCATL(src);
 
         expect(ast.diagnostics.filter(d => d.severity === "error")).toHaveLength(0);
 
-        const line = ast.lines[0];
+        const line = ast.lines[1];
         expect(line.kind).toBe("StatementLine");
 
         // @ts-expect-error narrow
@@ -76,7 +87,7 @@ describe("CATL parser", () => {
 
         expect(ast.diagnostics.filter(d => d.severity === "error")).toHaveLength(0);
 
-        const stmt = ast.lines[0];
+        const stmt = ast.lines[1];
         expect(stmt.kind).toBe("StatementLine");
         // @ts-expect-error narrow
         const kinds = stmt.elements.map(e => e.kind);
